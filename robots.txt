@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /policiadigital/
+Allow: /policiadigital/*.html
+Allow: /policiadigital/*.js
+Allow: /policiadigital/*.json
+
+Sitemap: https://mxjworld.github.io/policiadigital/sitemap.xml
+
+User-agent: googlebot
+Allow: /
