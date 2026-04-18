@@ -1,43 +1,31 @@
-# policiaDigital - Jekyll Configuration
-
 title: 🚔 policiaDigital
-description: "Car Patrol Survival - ¿Quién mejor que tú? Naiden."
+description: "Car Patrol Survival - Esquiva obstáculos al ritmo"
 baseurl: /policiadigital
-url: https://mxjworld.github.io/policiadigital
+url: https://mxjworld.github.io
 
-# Theme Slate (Oscuro y profesional)
 theme: jekyll-theme-slate
 remote_theme: pages-themes/slate@v0.2.0
-
-# Markdown
-markdown: kramdown
 
 # Plugins
 plugins:
   - jekyll-remote-theme
   - jekyll-seo-tag
   - jekyll-sitemap
-  - jekyll-feed
 
-# Metadata
-author: mxjworld
-email: tu@email.com
-repository: mxjworld/policiadigital
-github_username: mxjworld
+# Configuración
+markdown: kramdown
 lang: es
+author: mxjworld
+repository: mxjworld/policiadigital
 
-# Configuración adicional
-show_downloads: true
-downloads_url: https://mxjworld.github.io/policiadigital
+# Headers
+include:
+  - .nojekyll
+  - service-worker.js
+  - manifest.json
 
-# Excluir archivos
 exclude:
   - README.md
   - LICENSE
   - Gemfile
   - Gemfile.lock
-  - .gitignore
-
-# Incluir
-include:
-  - index.html
