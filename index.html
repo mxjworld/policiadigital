@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta property="og:title" content="🚔 policiaDigital - Car Patrol Survival">
+<meta property="og:description" content="¿Quién mejor que tú? Naiden. Esquiva las piedras y demuestra tu valor. Juega ahora 🎮">
+<meta property="og:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='630'%3E%3Crect fill='%23111' width='1200' height='630'/%3E%3Ctext x='600' y='315' font-size='120' fill='%234fc3f7' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-weight='bold'%3E🚔 policiaDigital%3C/text%3E%3C/svg%3E">
+<meta property="og:url" content="">
+<meta name="twitter:card" content="summary_large_image">
+<title>🚔 policiaDigital - Juego</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #111;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: 'Rajdhani', sans-serif;
+    overflow: hidden;
+    padding: 10px;
+  }
+
+  .container {
+    max-width: 400px;
+    width: 100%;
+  }
+
+  h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #4fc3f7;
+    text-shadow: 0 0 16px #4fc3f7, 0 0 32px #1565c0;
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+
+  .subtitle {
+    color: rgba(255,255,255,0.35);
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .scoreboard {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .score-box { text-align: center; }
+  .score-label { font-size: 0.65rem; letter-spacing: 2px; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+  .score-value { font-family: 'Orbitron', monospace; font-size: 1.2rem; font-weight: 700; color: #ffbe0b; text-shadow: 0 0 8px #ffbe0b; }
+
+  #gameCanvas {
+    border: 2px solid #1565c0;
+    box-shadow: 0 0 30px rgba(21,101,192,0.4);
+    border-radius: 4px;
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 380px;
+  }
+
+  .controls { 
+    margin-top: 12px; 
+    display: flex; 
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 8px 20px;
+    border: 1px solid #4fc3f7;
+    background: transparent;
+    color: #4fc3f7;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+
+  .btn:hover { background: #4fc3f7; color: #111; box-shadow: 0 0 16px #4fc3f7; }
+  .btn-red { border-color: #ef5350; color: #ef5350; }
+  .btn-red:hover { background: #ef5350; color: white; box-shadow: 0 0 16px #ef5350; }
+
+  .hint { 
+    margin-top: 8px; 
+    font-size: 0.7rem; 
+    color: rgba(255,255,255,0.2); 
+    letter-spacing: 2px; 
+    text-transform: uppercase; 
+    text-align: center;
+  }
+
+  .lives { display: flex; gap: 4px; align-items: center; }
+  .heart { font-size: 1.1rem; transition: all 0.3s; }
+  .heart.lost { filter: grayscale(1); opacity: 0.2; }
+
+  .level-msg {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    color: #ffbe0b;
+    letter-spacing: 3px;
+    text-align: center;
+    min-height: 20px;
+    margin-bottom: 4px;
+    text-shadow: 0 0 10px #ffbe0b;
+  }
+
+  .share-btn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #25d366;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+  }
+
+  .share-btn:hover {
+    background: #1fa857;
+    transform: scale(1.05);
+  }
+
+  .share-container {
+    text-align: center;
+    margin-top: 15px;
+  }
+
+  @media (max-width: 480px) {
+    .scoreboard {
+      gap: 10px;
+    }
+    
+    .score-value {
+      font-size: 1rem;
+    }
+
+    h1 {
+      font-size: 1.3rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🚔 policiaDigital</h1>
+  <p class="subtitle">Car Patrol Survival</p>
+  <div class="level-msg" id="levelMsg">¿Quién mejor que tú? Naiden.</div>
+
+  <div class="scoreboard">
+    <div class="score-box">
+      <div class="score-label">Puntos</div>
+      <div class="score-value" id="scoreDisplay">0</div>
+    </div>
+    <div class="score-box">
+      <div class="score-label">Nivel</div>
+      <div class="score-value" id="levelDisplay">1</div>
+    </div>
+    <div class="score-box">
+      <div class="score-label">Récord</div>
+      <div class="score-value" id="highScoreDisplay">0</div>
+    </div>
+    <div class="score-box">
+      <div class="score-label">Vidas</div>
+      <div class="lives" id="livesDisplay">
+        <span class="heart">💵</span>
+        <span class="heart">💵</span>
+        <span class="heart">💵</span>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas" width="380" height="500"></canvas>
+
+  <div class="controls">
+    <button class="btn" onclick="startGame()">▶ INICIAR</button>
+    <button class="btn btn-red" onclick="togglePause()">⏸ PAUSA</button>
+  </div>
+  <p class="hint">← → Flechas · A/D · Toca pantalla para mover</p>
+
+  <div class="share-container">
+    <a href="https://wa.me/?text=🚔%20policiaDigital%20-%20Juego%20de%20esquivar%20piedras%0A%0A%22¿Quién%20mejor%20que%20tú?%20Naiden.%22%0A%0AJuega%20aquí:%20https://mxjworld.github.io/policiadigital" 
+       class="share-btn" target="_blank">📱 Compartir en WhatsApp</a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https://mxjworld.github.io/policiadigital" 
+       class="share-btn" style="background: #1877f2;" target="_blank">f Compartir en Facebook</a>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+let gameState = 'idle';
+let score = 0, highScore = localStorage.getItem('policiaDigitalHighScore') || 0, level = 1, lives = 3, frame = 0;
+let animId, doublePoints = 0, invinciblePower = 0;
+let levelMessages = ["Lealtad","Disciplina","Honor","Autoridad","Dignidad","Moral","Sacrificio"];
+let shownLevelMsg = false;
+
+const player = {
+  x: W/2, y: H - 70, w: 38, h: 60,
+  speed: 4, trail: [], invincible: 0
+};
+
+let obstacles = [], particles = [], powerups = [], stars = [], roadLines = [];
+
+let audioCtx = null;
+let musicNodes = { playing: false };
+let sirenNodes = null;
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playRockHit() {
+  if (!audioCtx) return;
+  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.35, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) {
+    const t = i / audioCtx.sampleRate;
+    const thud = Math.exp(-t * 18) * (Math.random() * 2 - 1) * 0.9;
+    const crunch = Math.exp(-t * 40) * (Math.random() * 2 - 1) * 0.5 * Math.sin(t * 800);
+    const metal = Math.exp(-t * 12) * Math.sin(2 * Math.PI * 180 * t) * 0.3;
+    data[i] = thud + crunch + metal;
+  }
+  const src = audioCtx.createBufferSource();
+  src.buffer = buf;
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass'; filter.frequency.value = 600;
+  src.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+  src.start();
+}
+
+function playCoinDrop() {
+  if (!audioCtx) return;
+  const notes = [1800, 1400, 1100, 900];
+  notes.forEach((freq, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const t = audioCtx.currentTime + i * 0.07;
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, t);
+    osc.frequency.exponentialRampToValueAtTime(freq * 0.7, t + 0.12);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.2 - i * 0.04, t + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t + 0.15);
+  });
+}
+
+function startSiren() {
+  if (!audioCtx || sirenNodes) return;
+  const osc1 = audioCtx.createOscillator();
+  const osc2 = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const lfo = audioCtx.createOscillator();
+  const lfoGain = audioCtx.createGain();
+  lfo.frequency.value = 1.2;
+  lfoGain.gain.value = 180;
+  lfo.connect(lfoGain); lfoGain.connect(osc1.frequency);
+  osc1.frequency.value = 800; osc1.type = 'sawtooth';
+  osc2.frequency.value = 760; osc2.type = 'sawtooth';
+  gain.gain.value = 0.08;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'bandpass'; filter.frequency.value = 900; filter.Q.value = 1.5;
+  osc1.connect(filter); osc2.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+  lfo.start(); osc1.start(); osc2.start();
+  sirenNodes = { osc1, osc2, lfo, gain };
+}
+
+function stopSiren() {
+  if (!sirenNodes) return;
+  try {
+    sirenNodes.gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+    setTimeout(() => {
+      try { sirenNodes.osc1.stop(); sirenNodes.osc2.stop(); sirenNodes.lfo.stop(); } catch(e){}
+      sirenNodes = null;
+    }, 250);
+  } catch(e) { sirenNodes = null; }
+}
+
+function startMusic() {
+  if (!audioCtx || musicNodes.playing) return;
+  musicNodes.playing = true;
+  const masterGain = audioCtx.createGain();
+  masterGain.gain.value = 0.04;
+  masterGain.connect(audioCtx.destination);
+  const bpm = 128;
+  const step = 60 / bpm;
+  const bassNotes  = [80, 80, 100, 80, 90, 80, 100, 110];
+  const melodyNotes = [330, 370, 440, 370, 330, 294, 330, 370];
+  let stopped = false;
+
+  function scheduleBass(t) {
+    bassNotes.forEach((freq, i) => {
+      const st = t + i * step * 0.5;
+      const osc = audioCtx.createOscillator();
+      const env = audioCtx.createGain();
+      const filt = audioCtx.createBiquadFilter();
+      osc.type = 'sawtooth'; osc.frequency.value = freq;
+      filt.type = 'lowpass'; filt.frequency.value = 300;
+      env.gain.setValueAtTime(0.5, st);
+      env.gain.exponentialRampToValueAtTime(0.001, st + step * 0.45);
+      osc.connect(filt); filt.connect(env); env.connect(masterGain);
+      osc.start(st); osc.stop(st + step * 0.5);
+    });
+  }
+
+  function scheduleMelody(t) {
+    melodyNotes.forEach((freq, i) => {
+      const st = t + i * step;
+      const osc = audioCtx.createOscillator();
+      const env = audioCtx.createGain();
+      osc.type = 'square'; osc.frequency.value = freq;
+      env.gain.setValueAtTime(0.12, st);
+      env.gain.exponentialRampToValueAtTime(0.001, st + step * 0.8);
+      osc.connect(env); env.connect(masterGain);
+      osc.start(st); osc.stop(st + step);
+    });
+  }
+
+  function scheduleDrums(t) {
+    for (let i = 0; i < 8; i++) {
+      const st = t + i * step * 0.5;
+      if (i % 2 === 0) {
+        const osc = audioCtx.createOscillator(); const env = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(160, st);
+        osc.frequency.exponentialRampToValueAtTime(40, st + 0.08);
+        env.gain.setValueAtTime(0.55, st);
+        env.gain.exponentialRampToValueAtTime(0.001, st + 0.15);
+        osc.connect(env); env.connect(masterGain); osc.start(st); osc.stop(st + 0.2);
+      } else {
+        const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.05, audioCtx.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let j = 0; j < d.length; j++) d[j] = Math.random() * 2 - 1;
+        const src = audioCtx.createBufferSource(); src.buffer = buf;
+        const env = audioCtx.createGain();
+        const filt = audioCtx.createBiquadFilter();
+        filt.type = 'highpass'; filt.frequency.value = 8000;
+        env.gain.setValueAtTime(0.12, st);
+        env.gain.exponentialRampToValueAtTime(0.001, st + 0.05);
+        src.connect(filt); filt.connect(env); env.connect(masterGain); src.start(st);
+      }
+    }
+  }
+
+  const loopDur = step * 8;
+  let startT = audioCtx.currentTime + 0.05;
+
+  function scheduleLoop() {
+    if (stopped) return;
+    scheduleBass(startT); scheduleMelody(startT); scheduleDrums(startT);
+    startT += loopDur;
+    setTimeout(scheduleLoop, (loopDur - 0.1) * 1000);
+  }
+  scheduleLoop();
+  musicNodes.masterGain = masterGain;
+  musicNodes.stopFn = () => {
+    stopped = true;
+    masterGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+    setTimeout(() => { try { masterGain.disconnect(); } catch(e){} }, 600);
+    musicNodes = { playing: false };
+  };
+}
+
+function stopMusic() {
+  if (musicNodes.stopFn) musicNodes.stopFn();
+}
+
+const keys = {};
+document.addEventListener('keydown', e => {
+  keys[e.key] = true;
+  if (['ArrowLeft','ArrowRight','a','d'].includes(e.key) && gameState === 'idle') startGame();
+  if (e.key === ' ' && (gameState === 'idle' || gameState === 'dead')) startGame();
+});
+document.addEventListener('keyup', e => keys[e.key] = false);
+
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (gameState === 'idle' || gameState === 'dead') { startGame(); return; }
+});
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (gameState !== 'playing') return;
+  const rect = canvas.getBoundingClientRect();
+  const tx = (e.touches[0].clientX - rect.left) * (W / rect.width);
+  player.x = Math.max(24, Math.min(W - 24, tx));
+});
+canvas.addEventListener('click', () => {
+  if (gameState === 'idle' || gameState === 'dead') startGame();
+});
+
+for (let i = 0; i < 8; i++) {
+  roadLines.push({ y: i * 70, x: W/2, speed: 3 });
+}
+
+function startGame() {
+  initAudio();
+  score = 0; level = 1; lives = 3; frame = 0;
+  doublePoints = 0; invinciblePower = 0;
+  obstacles = []; particles = []; powerups = [];
+  player.x = W/2; player.trail = []; player.invincible = 0;
+  shownLevelMsg = false;
+  gameState = 'playing';
+  stopSiren();
+  stopMusic();
+  setTimeout(() => startMusic(), 300);
+  document.getElementById('levelMsg').textContent = '¡Esquiva las piedras!';
+  updateUI();
+  if (animId) cancelAnimationFrame(animId);
+  loop();
+}
+
+function togglePause() {
+  if (gameState === 'playing') gameState = 'paused';
+  else if (gameState === 'paused') { gameState = 'playing'; loop(); }
+}
+
+function updateUI() {
+  document.getElementById('scoreDisplay').textContent = score;
+  document.getElementById('levelDisplay').textContent = level;
+  document.getElementById('highScoreDisplay').textContent = highScore;
+  const hearts = document.querySelectorAll('.heart');
+  hearts.forEach((h, i) => h.classList.toggle('lost', i >= lives));
+}
+
+function getSpeed() {
+  return 1.5 * Math.pow(1.4, level - 1);
+}
+
+function spawnObstacle() {
+  const size = 14 + Math.random() * 22;
+  const speed = getSpeed() * (0.8 + Math.random() * 0.5);
+  const laneW = W - 60;
+  obstacles.push({
+    x: 30 + Math.random() * laneW,
+    y: -size, r: size,
+    speed, gray: Math.floor(40 + Math.random() * 80),
+    rot: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.08
+  });
+}
+
+function spawnPowerup() {
+  const type = Math.random() < 0.5 ? 'star' : 'shield';
+  powerups.push({
+    x: 30 + Math.random() * (W - 60), y: -20,
+    speed: getSpeed() * 0.6, type, pulse: 0
+  });
+}
+
+function addParticles(x, y, color, count = 14) {
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+    const spd = 2 + Math.random() * 4;
+    particles.push({
+      x, y, vx: Math.cos(angle) * spd, vy: Math.sin(angle) * spd,
+      life: 1, color, r: 2 + Math.random() * 4
+    });
+  }
+}
+
+function checkCollision(ax, ay, aw, ah, bx, by, bw, bh) {
+  return ax - aw/2 < bx + bw/2 && ax + aw/2 > bx - bw/2 &&
+         ay - ah/2 < by + bh/2 && ay + ah/2 > by - bh/2;
+}
+
+function update() {
+  frame++;
+  score += doublePoints > 0 ? 2 : 1;
+  if (doublePoints > 0) doublePoints--;
+  if (invinciblePower > 0) {
+    invinciblePower--;
+    if (invinciblePower === 0) stopSiren();
+  }
+  if (player.invincible > 0) player.invincible--;
+
+  const newLevel = Math.min(7, Math.floor(score / 7000) + 1);
+  if (newLevel > level) {
+    level = newLevel;
+    const msg = levelMessages[level - 1] || levelMessages[levelMessages.length - 1];
+    document.getElementById('levelMsg').textContent = `🏅 Nivel ${level}: ${msg}`;
+    addParticles(W/2, H/2, '#ffbe0b', 30);
+  }
+
+  const spd = player.speed + level * 0.3;
+  if ((keys['ArrowLeft'] || keys['a']) && player.x > 26) player.x -= spd;
+  if ((keys['ArrowRight'] || keys['d']) && player.x < W - 26) player.x += spd;
+
+  player.trail.push({ x: player.x, y: player.y + 28, a: 0.5, r: 6 + Math.random() * 4 });
+  if (player.trail.length > 18) player.trail.shift();
+  player.trail.forEach(t => { t.a -= 0.03; t.r += 0.3; });
+
+  const roadSpd = getSpeed() * 2;
+  roadLines.forEach(l => { l.y += roadSpd; if (l.y > H + 20) l.y -= H + 40; });
+
+  const spawnRate = Math.max(15, 55 - level * 6);
+  if (frame % spawnRate === 0) spawnObstacle();
+  if (frame % 250 === 0) spawnPowerup();
+
+  obstacles = obstacles.filter((o, i) => {
+    o.y += o.speed;
+    o.rot += o.rotSpeed;
+    if (o.y > H + 30) return false;
+
+    const isInvincible = player.invincible > 0 || invinciblePower > 0;
+    if (!isInvincible && checkCollision(player.x, player.y, player.w * 0.7, player.h * 0.7, o.x, o.y, o.r * 1.2, o.r * 1.2)) {
+      addParticles(player.x, player.y, '#ef5350', 20);
+      addParticles(o.x, o.y, '#888', 10);
+      playRockHit();
+      player.invincible = 90;
+      lives--;
+      updateUI();
+      if (lives <= 0) gameOver();
+      return false;
+    }
+    return true;
+  });
+
+  powerups = powerups.filter(p => {
+    p.y += p.speed; p.pulse += 0.12;
+    if (p.y > H + 30) return false;
+    if (checkCollision(player.x, player.y, player.w, player.h, p.x, p.y, 28, 28)) {
+      if (p.type === 'star') {
+        doublePoints = 300;
+        addParticles(p.x, p.y, '#ffbe0b', 20);
+        playCoinDrop();
+        document.getElementById('levelMsg').textContent = '⭐ ¡Puntos dobles por 5 segundos!';
+      } else {
+        invinciblePower = 180;
+        addParticles(p.x, p.y, '#4fc3f7', 20);
+        startSiren();
+        document.getElementById('levelMsg').textContent = '🛡️ ¡Escudo activo por 3 segundos!';
+      }
+      return false;
+    }
+    return true;
+  });
+
+  particles = particles.filter(p => {
+    p.x += p.vx; p.y += p.vy;
+    p.vx *= 0.91; p.vy *= 0.91;
+    p.life -= 0.025;
+    return p.life > 0;
+  });
+
+  updateUI();
+}
+
+function gameOver() {
+  gameState = 'dead';
+  stopMusic();
+  stopSiren();
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem('policiaDigitalHighScore', highScore);
+  }
+  updateUI();
+}
+
+function drawRoad() {
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(0, 0, W, H);
+
+  for (let i = 0; i < 6; i++) {
+    ctx.fillStyle = `rgba(0,0,0,${0.1 + i * 0.02})`;
+    ctx.fillRect(i * 2, 0, 1, H);
+  }
+
+  ctx.fillStyle = '#2a2a2a';
+  ctx.fillRect(0, 0, 22, H);
+  ctx.fillRect(W - 22, 0, 22, H);
+
+  for (let y = 0; y < H; y += 30) {
+    ctx.fillStyle = (Math.floor(y / 30) % 2 === 0) ? '#e53935' : '#fff';
+    ctx.fillRect(0, y, 22, 15);
+    ctx.fillRect(W - 22, y, 22, 15);
+  }
+
+  roadLines.forEach(l => {
+    ctx.fillStyle = 'rgba(255,235,59,0.7)';
+    ctx.fillRect(W/2 - 3, l.y, 6, 30);
+  });
+
+  roadLines.forEach(l => {
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.fillRect(W/3 - 1, l.y, 3, 24);
+    ctx.fillRect(2*W/3 - 1, l.y, 3, 24);
+  });
+}
+
+function drawPoliceCar(x, y, invincible, invPower) {
+  const blink = invincible > 0 && Math.floor(invincible / 6) % 2 === 0;
+  if (blink) return;
+
+  ctx.save();
+  ctx.translate(x, y);
+
+  if (invPower > 0) {
+    ctx.beginPath();
+    ctx.arc(0, 0, 32, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(79,195,247,${0.15 + 0.1 * Math.sin(frame * 0.2)})`;
+    ctx.fill();
+    ctx.strokeStyle = '#4fc3f7';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  ctx.shadowBlur = 12;
+  ctx.shadowColor = 'rgba(0,0,0,0.6)';
+
+  ctx.fillStyle = '#1565c0';
+  ctx.beginPath();
+  ctx.roundRect(-16, -26, 32, 52, 6);
+  ctx.fill();
+
+  ctx.fillStyle = '#1976d2';
+  ctx.beginPath();
+  ctx.roundRect(-13, -26, 26, 18, 4);
+  ctx.fill();
+
+  ctx.fillStyle = 'rgba(144,202,249,0.8)';
+  ctx.beginPath();
+  ctx.roundRect(-11, -22, 22, 14, 3);
+  ctx.fill();
+
+  ctx.fillStyle = '#111';
+  ctx.fillRect(-10, -16, 20, 5);
+
+  const lightOn = Math.floor(frame / 6) % 2 === 0;
+  ctx.fillStyle = lightOn ? '#f44336' : 'rgba(244,67,54,0.2)';
+  ctx.fillRect(-9, -15, 8, 4);
+  ctx.fillStyle = lightOn ? 'rgba(33,150,243,0.3)' : '#2196f3';
+  ctx.fillRect(1, -15, 8, 4);
+
+  ctx.fillStyle = 'rgba(144,202,249,0.6)';
+  ctx.fillRect(-16, -8, 5, 10);
+  ctx.fillRect(11, -8, 5, 10);
+
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(-16, 2);
+  ctx.lineTo(16, 2);
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.font = 'bold 5px Rajdhani, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('POLICÍA', 0, 10);
+
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(-16, 12, 32, 3);
+
+  ctx.fillStyle = '#1565c0';
+  ctx.beginPath();
+  ctx.roundRect(-13, 15, 26, 11, 3);
+  ctx.fill();
+
+  ctx.fillStyle = '#f44336';
+  ctx.fillRect(-15, 18, 7, 5);
+  ctx.fillRect(8, 18, 7, 5);
+
+  ctx.fillStyle = '#111';
+  ctx.fillRect(-19, -18, 5, 10);
+  ctx.fillRect(14, -18, 5, 10);
+  ctx.fillRect(-19, 10, 5, 10);
+  ctx.fillRect(14, 10, 5, 10);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.2)';
+  ctx.fillRect(-18, -17, 3, 4);
+  ctx.fillRect(15, -17, 3, 4);
+
+  ctx.shadowBlur = 0;
+  ctx.restore();
+}
+
+function drawRock(o) {
+  ctx.save();
+  ctx.translate(o.x, o.y);
+  ctx.rotate(o.rot);
+
+  const g = o.gray;
+  ctx.shadowBlur = 6;
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+
+  ctx.beginPath();
+  ctx.moveTo(o.r * 0.9, 0);
+  ctx.bezierCurveTo(o.r * 0.8, -o.r * 0.85, -o.r * 0.3, -o.r, -o.r * 0.85, -o.r * 0.4);
+  ctx.bezierCurveTo(-o.r, o.r * 0.3, -o.r * 0.5, o.r * 0.9, o.r * 0.1, o.r * 0.95);
+  ctx.bezierCurveTo(o.r * 0.6, o.r, o.r * 1.0, o.r * 0.5, o.r * 0.9, 0);
+  ctx.fillStyle = `rgb(${g},${g},${g})`;
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.ellipse(-o.r * 0.2, -o.r * 0.2, o.r * 0.3, o.r * 0.2, -0.5, 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(255,255,255,0.18)`;
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.ellipse(o.r * 0.2, o.r * 0.3, o.r * 0.25, o.r * 0.18, 0.5, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(0,0,0,0.25)';
+  ctx.fill();
+
+  ctx.restore();
+}
+
+function drawPowerup(p) {
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  const scale = 1 + 0.12 * Math.sin(p.pulse);
+  ctx.scale(scale, scale);
+
+  ctx.shadowBlur = 18 + 8 * Math.sin(p.pulse);
+
+  if (p.type === 'star') {
+    ctx.shadowColor = '#ffbe0b';
+    ctx.fillStyle = '#ffbe0b';
+    drawStar(0, 0, 14, 7, 6);
+    ctx.fillStyle = '#1565c0';
+    ctx.font = 'bold 7px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('★', 0, 0);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 5px Orbitron';
+    ctx.fillText('x2', 0, 8);
+  } else {
+    ctx.shadowColor = '#4fc3f7';
+    ctx.fillStyle = '#1565c0';
+    drawShield(0, 0, 14);
+    ctx.fillStyle = '#4fc3f7';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🛡', 0, 0);
+  }
+
+  ctx.restore();
+}
+
+function drawStar(cx, cy, outerR, innerR, points) {
+  ctx.beginPath();
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 === 0 ? outerR : innerR;
+    const angle = (i * Math.PI) / points - Math.PI / 2;
+    if (i === 0) ctx.moveTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+    else ctx.lineTo(cx + r * Math.cos(angle), cy + r * Math.sin(angle));
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawShield(cx, cy, size) {
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - size);
+  ctx.lineTo(cx + size, cy - size * 0.3);
+  ctx.lineTo(cx + size * 0.8, cy + size * 0.5);
+  ctx.lineTo(cx, cy + size);
+  ctx.lineTo(cx - size * 0.8, cy + size * 0.5);
+  ctx.lineTo(cx - size, cy - size * 0.3);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#4fc3f7';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+function draw() {
+  drawRoad();
+
+  player.trail.forEach((t, i) => {
+    const alpha = t.a * (i / player.trail.length);
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(220,220,220,${alpha * 0.4})`;
+    ctx.fill();
+  });
+
+  particles.forEach(p => {
+    ctx.globalAlpha = p.life;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+
+  powerups.forEach(drawPowerup);
+
+  obstacles.forEach(drawRock);
+
+  const isInvincible = player.invincible > 0 || invinciblePower > 0;
+  drawPoliceCar(player.x, player.y, player.invincible, invinciblePower);
+
+  if (doublePoints > 0) {
+    ctx.fillStyle = 'rgba(255,190,11,0.85)';
+    ctx.fillRect(W - 110, 8, 100, 22);
+    ctx.fillStyle = '#111';
+    ctx.font = 'bold 10px Orbitron, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`⭐ x2 ${Math.ceil(doublePoints/60)}s`, W - 60, 23);
+  }
+  if (invinciblePower > 0) {
+    ctx.fillStyle = 'rgba(79,195,247,0.85)';
+    ctx.fillRect(W - 110, 34, 100, 22);
+    ctx.fillStyle = '#111';
+    ctx.font = 'bold 10px Orbitron, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`🛡 ${Math.ceil(invinciblePower/60)}s`, W - 60, 49);
+  }
+
+  if (gameState === 'idle') {
+    ctx.fillStyle = 'rgba(0,0,0,0.82)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = 'center';
+
+    ctx.fillStyle = '#4fc3f7';
+    ctx.shadowBlur = 20; ctx.shadowColor = '#4fc3f7';
+    ctx.font = 'bold 28px Orbitron, monospace';
+    ctx.fillText('🚔 policiaDigital', W/2, 160);
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.font = '17px Rajdhani, sans-serif';
+    ctx.fillText('¿Quién mejor que tú? Naiden.', W/2, 210);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.font = '14px Rajdhani, sans-serif';
+    ctx.fillText('Esquiva las piedras', W/2, 248);
+    ctx.fillText('← → Flechas · A/D · Toca pantalla', W/2, 272);
+
+    ctx.fillStyle = '#ffbe0b';
+    ctx.shadowBlur = 10; ctx.shadowColor = '#ffbe0b';
+    ctx.font = 'bold 15px Orbitron, monospace';
+    ctx.fillText('[ TOCA PARA INICIAR ]', W/2, 330);
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.font = '12px Rajdhani, sans-serif';
+    ctx.fillText('⭐ Estrella = x2 puntos  •  🛡 Escudo = Invencible', W/2, 380);
+    ctx.fillText('💵 Paca = vida extra', W/2, 400);
+  }
+
+  if (gameState === 'paused') {
+    ctx.fillStyle = 'rgba(0,0,0,0.72)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#4fc3f7';
+    ctx.shadowBlur = 20; ctx.shadowColor = '#4fc3f7';
+    ctx.font = 'bold 30px Orbitron, monospace';
+    ctx.fillText('⏸ PAUSA', W/2, H/2);
+    ctx.shadowBlur = 0;
+  }
+
+  if (gameState === 'dead') {
+    ctx.fillStyle = 'rgba(0,0,0,0.88)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.textAlign = 'center';
+
+    ctx.fillStyle = '#ef5350';
+    ctx.shadowBlur = 22; ctx.shadowColor = '#ef5350';
+    ctx.font = 'bold 22px Orbitron, monospace';
+    ctx.fillText('Preparando tu baja', W/2, 160);
+    ctx.fillText('voluntaria...', W/2, 190);
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.font = '18px Rajdhani, sans-serif';
+    ctx.fillText(`Puntuación: ${score}`, W/2, 240);
+    ctx.fillText(`Nivel alcanzado: ${level}`, W/2, 265);
+
+    if (score >= highScore && score > 0) {
+      ctx.fillStyle = '#ffbe0b';
+      ctx.shadowBlur = 12; ctx.shadowColor = '#ffbe0b';
+      ctx.font = 'bold 15px Orbitron, monospace';
+      ctx.fillText('🏆 ¡Felicidades en tu nuevo récord!', W/2, 305);
+      ctx.shadowBlur = 0;
+    }
+
+    ctx.fillStyle = 'rgba(255,190,11,0.8)';
+    ctx.font = '15px Rajdhani, sans-serif';
+    ctx.fillText(`Récord: ${highScore}`, W/2, 330);
+
+    ctx.fillStyle = '#4fc3f7';
+    ctx.shadowBlur = 10; ctx.shadowColor = '#4fc3f7';
+    ctx.font = 'bold 14px Orbitron, monospace';
+    ctx.fillText('[ TOCA PARA REINICIAR ]', W/2, 390);
+    ctx.shadowBlur = 0;
+  }
+}
+
+function loop() {
+  if (gameState === 'playing') update();
+  draw();
+  if (gameState === 'playing') animId = requestAnimationFrame(loop);
+}
+
+updateUI();
+loop();
+</script>
+</body>
+</html>
