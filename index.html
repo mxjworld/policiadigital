@@ -968,7 +968,7 @@ function drawRoad() {
   for (let y = 0; y < H; y += 28) {
     ctx.fillStyle = (Math.floor(y / 28) % 2 === 0) ? '#e53935' : '#fff';
     ctx.fillRect(0, y, 24, 14);
-    ctx.fillRect(W - 24, y, 14);
+    ctx.fillRect(W - 24, y, 24, 14);
   }
 
   roadLines.forEach(l => {
